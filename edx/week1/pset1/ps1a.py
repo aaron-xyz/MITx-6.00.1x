@@ -1,4 +1,6 @@
+s = "azcbobobegghakl"
 num_vowels = 0
+
 for letter in s:
     if letter in 'aeiou':
         num_vowels += 1
