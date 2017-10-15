@@ -39,18 +39,30 @@ def chooseWord(wordlist):
 # end of helper code
 # -----------------------------------
 
+
 # Load the list of words into the variable wordlist
 # so that it can be accessed from anywhere in the program
 wordlist = loadWords()
+
 
 def isWordGuessed(secretWord, lettersGuessed):
     '''
     secretWord: string, the word the user is guessing
     lettersGuessed: list, what letters have been guessed so far
     returns: boolean, True if all the letters of secretWord are in lettersGuessed;
-      False otherwise
+    False otherwise
+    
+    >> isWordGuessed("apple", ['e', 'i', 'k', 'p', 'r', 's'])
+    False
     '''
-    # FILL IN YOUR CODE HERE...
+    size = len(secretWord)
+    counter = 0
+    # check letter by letter
+    for letter in secretWord:
+        if letter in lettersGuessed:
+            counter += 1
+    
+    return counter == size
 
 
 
@@ -59,9 +71,19 @@ def getGuessedWord(secretWord, lettersGuessed):
     secretWord: string, the word the user is guessing
     lettersGuessed: list, what letters have been guessed so far
     returns: string, comprised of letters and underscores that represents
-      what letters in secretWord have been guessed so far.
+    what letters in secretWord have been guessed so far.
+    
+    >> print(getGuessedWord("apple", ['e', 'i', 'k', 'p', 'r', 's']))
+    _ pp _ e
     '''
-    # FILL IN YOUR CODE HERE...
+    guessed = ""
+    for letter in secretWord:
+        if letter in lettersGuessed:
+            guessed = guessed + letter
+        else:
+            guessed += " _ "
+    
+    return guessed
 
 
 
@@ -69,10 +91,29 @@ def getAvailableLetters(lettersGuessed):
     '''
     lettersGuessed: list, what letters have been guessed so far
     returns: string, comprised of letters that represents what letters have not
-      yet been guessed.
-    '''
-    # FILL IN YOUR CODE HERE...
+    yet been guessed.
     
+    >>> lettersGuessed = ['e', 'i', 'k', 'p', 'r', 's']
+    >>> print(getAvailableLetters(lettersGuessed))
+    abcdfghjlmnoqtuvwxyz
+    '''
+    # import the alphabet in string
+    from string import ascii_lowercase
+    # alphabet string
+    abc_string = ascii_lowercase
+    # alphabet list
+    abc_list = list(abc_string)
+    
+    # remove letters guessed
+    for letter in abc_string:
+        if letter in lettersGuessed:
+            abc_list.remove(letter)
+    
+    # join list into string and return it
+    abc_string = ''.join(abc_list)
+    return abc_string
+
+
 
 def hangman(secretWord):
     '''
@@ -94,16 +135,55 @@ def hangman(secretWord):
 
     Follows the other limitations detailed in the problem write-up.
     '''
-    # FILL IN YOUR CODE HERE...
-
-
-
-
+    size = len(secretWord)
+    numGuesses = 8
+    
+    print("Welcome to the game, Hangman!")
+    print("I am thinking of a word that is", size, "letters long.")
+    print("-------------")
+    
+    lettersGuessed = []
+    availableLetters = getAvailableLetters(lettersGuessed)
+    
+    while numGuesses > 0:
+        print("You have", numGuesses, "guesses left.")
+        print("Available letters:", availableLetters, " ")
+        
+        letterGuess = input("Please guess a letter: ")
+        
+        # When the letterGuess is new
+        if letterGuess in availableLetters:
+            # Append letter in lettersGuessed list
+            lettersGuessed.append(letterGuess)
+            # correct guess
+            if letterGuess in secretWord:
+                # show positions of letterGuess in secretWord
+                print("Good guess:", getGuessedWord(secretWord, lettersGuessed))
+            else:
+                # Substract one from numGuesses
+                print("Oops! That letter is not in my word:", getGuessedWord(secretWord, lettersGuessed))
+                numGuesses -= 1
+            # Refresh the availableLetters
+            availableLetters = getAvailableLetters(lettersGuessed)
+        # When letterGuess is NOT new
+        else:
+            # Notify that letter has been guessed before
+            print("Oops! You've already guessed that letter:",getGuessedWord(secretWord, lettersGuessed))
+        print("-------------")
+        # Break the loop user if the user guess the whole word
+        if isWordGuessed(secretWord, lettersGuessed):
+            break
+    
+    if numGuesses > 0:
+        print("Congratulations, you won!")
+    else:
+        print("Sorry, you ran out of guesses. The word was", secretWord, ".")
+            
 
 
 # When you've completed your hangman function, uncomment these two lines
 # and run this file to test! (hint: you might want to pick your own
 # secretWord while you're testing)
 
-# secretWord = chooseWord(wordlist).lower()
-# hangman(secretWord)
+secretWord = chooseWord(wordlist).lower()
+hangman(secretWord)
